@@ -1,11 +1,26 @@
-<script setup>
+<script>
+import { ref } from 'vue';
+
+export const username = ref('Anonim');
+
+export default {
+    methods: {
+        inputChange(event) {
+            if (event.target.value == '') {
+                username.value = "Anonim";
+            } else {
+                username.value = event.target.value;
+            }
+        }
+    }
+}
 </script>
 
 <template>
     <article class="login__container">
         <section class="login__content">
             <span class="login__label">Введите логин</span>
-            <input class="login__input" ype="text" placeholder="Логин">
+            <input v-model="username" @input="inputChange" class="login__input" type="text" placeholder="Логин">
         </section>
     </article>
 </template>
@@ -20,7 +35,6 @@
     -webkit-box-shadow: 1px 1px 8px 7px rgba(34, 60, 80, 0.11);
     -moz-box-shadow: 1px 1px 8px 7px rgba(34, 60, 80, 0.11);
     box-shadow: 1px 1px 8px 7px rgba(34, 60, 80, 0.11);
-
 }
 
 .login__content {
@@ -33,7 +47,7 @@
     row-gap: 6px;
 }
 
-.login__label{
+.login__label {
     font-size: 16px;
     font-weight: 400;
     color: rgba(94, 94, 94, 1);
