@@ -7,14 +7,15 @@
                     <span class="message__text"> {{ message.text }}</span>
                     <span class="message__time">{{ formatTime(message.time) }}</span>
                     <button>
-                        <img class="message-delete_btn" src="./../assets/cross_close.svg" alt="">
+                        <img @click="() => deleteMessage(index)" class="message-delete_btn"
+                            src="./../assets/cross_close.svg" alt="">
                     </button>
                 </section>
             </div>
             <div v-else class="error_loading">
                 <pulse-loader :loading="loading" :color="color" :size="size"></pulse-loader>
                 <p>
-                    Возникла ошибка
+                    Выполняю загрузку
                 </p>
             </div>
         </section>
@@ -53,18 +54,16 @@ export default {
                 text: this.inputValue,
                 username: username.value,
             })
-                .then(response => {
+                .then(_response => {
                     this.isStatus200 = true;
-                    console.log(response);
                     this.inputValue = "";
 
                     this.$nextTick(() => {
                         this.$refs.messageContainer.scrollTop = this.$refs.messageContainer.scrollHeight;
                     })
                 })
-                .catch(error => {
+                .catch(_error => {
                     this.isStatus200 = false;
-                    console.log(error);
                 })
                 .finally(
                     () => {
@@ -84,9 +83,8 @@ export default {
                     })
 
                 })
-                .catch(error => {
+                .catch(_error => {
                     this.isStatus200 = false;
-                    console.log(error);
                 })
         },
         getLastMessage() {
@@ -97,21 +95,35 @@ export default {
                     this.$nextTick(() => {
                         this.$refs.messageContainer.scrollTop = this.$refs.messageContainer.scrollHeight;
                     })
-
                 })
-                .catch(error => {
+                .catch(_error => {
                     this.isStatus200 = false;
-                    console.log(error);
+                })
+        },
+        deleteMessage(messageIndex) {
+            const messageId = this.messages[messageIndex].id;
+
+            axios.post("http://firstphp/delete_message.php", {
+                action: "delete_message",
+                message_id: messageId,
+            })
+                .then(response => {
+                    if (response.status == 200) {
+                        this.messages.splice(messageIndex, 1);
+                    }
+                })
+                .catch(_error => {
+                    this.isStatus200 = false;
                 })
         },
         formatTime(timeString) {
-        const time = new Date(timeString);
-        const hours = time.getHours();
-        const minutes = time.getMinutes();
-        const formattedHours = hours < 10 ? '0' + hours : hours;
-        const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
-        return formattedHours + ':' + formattedMinutes;
-    }
+            const time = new Date(timeString);
+            const hours = time.getHours();
+            const minutes = time.getMinutes();
+            const formattedHours = hours < 10 ? '0' + hours : hours;
+            const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+            return formattedHours + ':' + formattedMinutes;
+        }
     },
     beforeMount() {
         this.getMessage()
@@ -247,7 +259,7 @@ export default {
     gap: 10%;
 }
 
-.error_loading p{
+.error_loading p {
     font-size: 25px;
     font-weight: 400;
 }
